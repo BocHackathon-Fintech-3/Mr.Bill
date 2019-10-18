@@ -27,13 +27,19 @@ class Client(models.Model):
         return '{} {}'.format(self.first_name, self.last_name)
 
     @property
+    def hid(self):
+        return self.id.hex
+
+    @property
     def receiving_email(self):
         return "%s@incoming.mrbill.app" % str(self.id.hex)
+
+    def __str__(self):
+        return self.hid
+
 
 class Vendor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=254)
     invoice_sending_email = models.EmailField(unique=True)
-    bank_account_no = models.CharField(max_length=254,blank=True)
-
-
+    bank_account_no = models.CharField(max_length=254, blank=True)
