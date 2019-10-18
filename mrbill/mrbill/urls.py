@@ -19,4 +19,5 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('facebook/', include('facebook.urls')),
+    path('sendgrid/', include('sendgrid.urls')),
 ]
