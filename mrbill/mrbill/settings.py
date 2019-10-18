@@ -118,3 +118,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+MRBILL_FBPAGE_ACCESS_TOKEN = os.environ.get('MRBILL_FBPAGE_ACCESS_TOKEN')
+MR_BILL_FB_VERIFY_TOKEN = os.environ.get('MR_BILL_FB_VERIFY_TOKEN')
