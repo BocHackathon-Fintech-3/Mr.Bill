@@ -3,6 +3,7 @@ from django.http import HttpResponse, Http404
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import FileSystemStorage
 import uuid
+import json
 from pprint import pprint
 from accounts.models import Client, Vendor
 from billing.models import Bill
@@ -10,7 +11,6 @@ from billing.models import Bill
 
 @csrf_exempt
 def incoming_mail_parse(request):
-    print(request)
     vals = request.POST
     target_email = vals['to']
     client_id, domain = target_email.split('@')
@@ -26,10 +26,6 @@ def incoming_mail_parse(request):
         sender_email = sender_email_raw[chevron_left_pos + 1:chevron_right_pos]
     else:
         sender_email = sender_email_raw
-    # envelope = vals['envelope']
-
-    attachments_no = vals['attachments']
-    # attachment_info = vals['attachment_info']
     pprint(vals)
 
     # myfile = request.FILES['myfile']
@@ -47,10 +43,9 @@ def incoming_mail_parse(request):
         email_content_txt=vals['text'],
         email_sender_ip=vals['sender_ip']
     )
-    attachment_amt = vars['attachments']
     # fs = FileSystemStorage()
-
-    for key, data in vars['attachment-info'].vals():
+    attachment_info = json.loads(vals['attachment-info'])
+    for key, data in attachment_info.items():
         if data['type'] == 'application/pdf':
             pdf = request.FILES[key]
             bill.invoice = pdf

@@ -14,7 +14,7 @@ class Bill(models.Model):
     invoice = models.FileField(upload_to='bills/%Y/%m/%d/')
     invoice_2 = models.FileField(blank=True, null=True)
     # details after parsing follow
-    amount = models.DecimalField(blank=True, max_digits=10, decimal_places=2)
+    amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
     expires_on = models.DateTimeField(blank=True, null=True)
     payment = models.ForeignKey('billing.Payment', on_delete=models.CASCADE, blank=True, null=True)
 
