@@ -32,10 +32,11 @@ class Messenger(BaseMessenger):
 
 def webhook(request):
     if request.method == 'GET':
-        if (request.GET.get('hub.verify_token') == settings.MR_BILL_FB_VERIFY_TOKEN):
-            return request.GET.get('hub.challenge')
+        if (request.GET['hub.verify_token'] == settings.MR_BILL_FB_VERIFY_TOKEN):
+            return HttpResponse(request.GET['hub.challenge'])
+        print(settings.MR_BILL_FB_VERIFY_TOKEN)
         raise ValueError('FB_VERIFY_TOKEN does not match.')
     elif request.method == 'POST':
-        messenger = Messenger(settings.MRBILL_FBPAGE_ACCESS_TOKEN)
+        messenger = Messenger(settings.MR_BILL_FBPAGE_ACCESS_TOKEN)
         messenger.handle(request.get_json(force=True))
     return HttpResponse("ok")

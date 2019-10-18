@@ -25,7 +25,7 @@ SECRET_KEY = 'z*w8w1c+f!0+-tey_u^0$s^n!9zs9s6nm!k#3vb)#!ip@n#pbe'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.ngrok.io', 'locahost']
 
 
 # Application definition
@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'facebook',
+    'sendgrid'
 ]
 
 MIDDLEWARE = [
@@ -120,5 +122,5 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
-MRBILL_FBPAGE_ACCESS_TOKEN = os.environ.get('MRBILL_FBPAGE_ACCESS_TOKEN')
+MR_BILL_FBPAGE_ACCESS_TOKEN = os.environ.get('MR_BILL_FBPAGE_ACCESS_TOKEN')
 MR_BILL_FB_VERIFY_TOKEN = os.environ.get('MR_BILL_FB_VERIFY_TOKEN')
