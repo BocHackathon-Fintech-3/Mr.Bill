@@ -21,7 +21,7 @@ def get_access_token(auth_code=None):
     if auth_code:
         payload['grant_type'] = 'authorization_code'
         payload['scope'] = 'UserOAuth2Security'
-        payload['code'] = 'auth_code'
+        payload['code'] = auth_code
     else:
         payload['grant_type'] = 'client_credentials'
         payload['scope'] = 'TPPOAuth2Security'
@@ -59,20 +59,16 @@ def get_subscription_id(access_token):
     headers = {
         'content-type': "application/json",
         'Authorization': "Bearer %s" % access_token,
-        "Content-Type": "application/json",
-        "APIm-Debug-Trans-Id": "true",
-        "app_name": "MrBill",
-        "tppid": "singpaymentdata",
-        "originUserId": "mrbill",
-        "timeStamp": "%s" % datetime.datetime.now().isoformat(),
+        "app_name": "abc",
+        "tppId": "singpaymentdata",
+        "originUserId": "abc",
+        "timestamp": "%s" % int(datetime.datetime.now().timestamp()),
         "journeyId": "abc",
     }
     res = requests.post(url, json=payload, headers=headers, params=params)
     res_json = res.json()
     print(res.text)
     return res_json
-
-
 
 
 def patch_subscription(access_token, subscription_id):
@@ -97,29 +93,46 @@ def patch_subscription(access_token, subscription_id):
     headers = {
         'content-type': "application/json",
         'Authorization': "Bearer %s" % access_token,
-        "Content-Type": "application/json",
-        "APIm-Debug-Trans-Id": "true",
-        "app_name": "MrBill",
-        "tppid": "singpaymentdata",
-        "originUserId": "mrbill",
-        "timeStamp": "%s" % datetime.datetime.now().isoformat(),
+        "tppId": "singpaymentdata",
+        "originUserId": "abc",
+        "timestamp": "%s" % datetime.datetime.now().isoformat(),
         "journeyId": "abc",
     }
     res = requests.patch(url, json=payload, headers=headers, params=params)
-    res_json = res.json()
     print(res.text)
+    res_json = res.json()
     return res_json
 
 
 def get_accounts_boc_approval_url(access_token, subscription_id, redirect_uri):
-
     params = {
-        "response_type":'code',
+        "response_type": 'code',
         "redirect_uri": redirect_uri,
         "scope": "UserOAuth2Security",
         'client_id': settings.BOC_CLIENT_ID,
-        "subscriptionId": subscription_id
+        "subscriptionid": subscription_id
     }
     url = _get_url('/oauth2/authorize?%s' % urllib.parse.urlencode(params))
     print(url)
     return url
+
+
+def get_subscription_details(access_token, subscription_id):
+    url = _get_url('/v1/subscriptions/%s' % subscription_id)
+    params = {
+        'client_id': settings.BOC_CLIENT_ID,
+        'client_secret': settings.BOC_CLIENT_SECRET,
+    }
+
+    headers = {
+        'Authorization': "Bearer %s" % access_token,
+        "content-type": "application/json",
+        "tppId": "singpaymentdata",
+        "originUserId": "abc",
+        "timestamp": "%s" % int(datetime.datetime.now().timestamp()),
+        "journeyId": "abc",
+    }
+    res = requests.get(url, data='', headers=headers, params=params)
+    print(res.text)
+    res_json = res.json()
+    return res_json

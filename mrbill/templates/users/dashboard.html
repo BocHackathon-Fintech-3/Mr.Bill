@@ -1,4 +1,79 @@
 {% extends 'users/base.html' %}
 {% block content %}
-    <h1 class="text-blue-700">Welcome {{ request.user.username }}</h1>
+    <div class="flex min-h-screen p-2">
+        <div class="flex-1 flex justify-center items-center">
+            <h1 class="text-blue-700 text-center">Welcome {{ request.user.username }}<br>
+                <button class="add-marker-btn border border-red-500 rounded px-2 py-3 font-bold block w-64 mb-4">Add
+                    amount box
+                </button>
+                <button class="add-marker-btn border border-blue-500 rounded px-2 py-3 font-bold block w-64 mb-4">Add
+                    due date box
+                </button>
+                <button class="add-marker-btn border border-green-500 rounded px-2 py-3 font-bold block w-64 mb-4">Add
+                    invoice no box
+                </button>
+                <button class="p-3 text-blue-700" id="checkMarkers">Check markers</button>
+            </h1>
+        </div>
+        <div class="flex-1">
+            <img id="bill-template" src="{{ STATIC_URL }}eac_001.png" class="h-screen w-auto"/>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_js %}
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" type="application/javascript"></script>
+    <script src="https://unpkg.com/markerjs" type="application/javascript"></script>
+    <script>
+        var mark = new markerjs.MarkerArea(document.getElementById('bill-template'), {renderAtNaturalSize: true});
+        window.bboxes = {}
+        mark.open();
+
+        $(document).ready(function () {
+            $('.add-marker-btn').click(function () {
+                var rectMarker = mark.addMarker(markerjs.RectMarker);
+            });
+            $('#checkMarkers').click(function (e) {
+                var data = {
+                    rectMarkers: []
+                };
+                var dpi = 96;
+                var $svg = $($('svg')[0]);
+                data.imgWidth = parseInt($svg.attr('width'));
+                data.imgHeight = parseInt($svg.attr('height'));
+                $('.rect-marker').each(function () {
+                    var matrix = $(this).prop('transform').baseVal[0].matrix;
+                    var rect = {
+                        x: matrix.e,
+                        y: matrix.f,
+                    }
+                    var rect_elem = $(this).find('.render-visual rect')[0]
+                    rect.w = parseInt($(rect_elem).attr('width'));
+                    rect.h = parseInt($(rect_elem).attr('height'));
+
+                    rect.y1 = data.imgHeight - rect.y;
+                    rect.y0 = rect.y1 - rect.h;
+                    rect.x0 = rect.x;
+                    rect.x1 = rect.x0 + rect.w;
+                    rect.inches = {
+                        x0: rect.x0 / dpi,
+                        y0: rect.y0 / dpi,
+                        x1: rect.x1 / dpi,
+                        y1: rect.y1 / dpi,
+                    }
+                    data.rectMarkers.push(rect);
+                });
+                console.log(data);
+
+                window.bboxes.amount_bbx = "" + data.rectMarkers[0].inches.x0 + "," + data.rectMarkers[0].inches.y0 + "," + data.rectMarkers[0].inches.x1 + "," + data.rectMarkers[0].inches.y1;
+                window.bboxes.due_date_bbx = "" + data.rectMarkers[1].inches.x0 + "," + data.rectMarkers[1].inches.y0 + "," + data.rectMarkers[1].inches.x1 + "," + data.rectMarkers[1].inches.y1;
+                window.bboxes.invoice_no_bbx = "" + data.rectMarkers[2].inches.x0 + "," + data.rectMarkers[2].inches.y0 + "," + data.rectMarkers[2].inches.x1 + "," + data.rectMarkers[2].inches.y1;
+                console.log(window.bboxes);
+            })
+        });
+    </script>
+    <script>
+
+    </script>
 {% endblock %}
