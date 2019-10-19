@@ -34,6 +34,14 @@ class Client(models.Model):
     def receiving_email(self):
         return "%s@incoming.mrbill.app" % str(self.id.hex)
 
+    def is_configured(self):
+        return bool(self.pin)
+
+    def get_unpaid_bills(self):
+        return self.bills.filter(payment__isnull=True)
+    def has_unpaid_bills(self):
+        return self.get_unpaid_bills().exists()
+
     def __str__(self):
         return self.hid
 

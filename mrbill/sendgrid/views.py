@@ -7,6 +7,12 @@ import json
 from pprint import pprint
 from accounts.models import Client, Vendor
 from billing.models import Bill
+from threading import Thread
+
+
+def parse_and_notify(bill):
+    bill.parse_pdf()
+    bill.notify_user_initial()
 
 
 @csrf_exempt
@@ -52,5 +58,7 @@ def incoming_mail_parse(request):
             break
             # filename = fs.save("%s.pdf" % str(uuid.uuid4().hex), pdf)
     bill.save()
+    t = Thread(target=parse_and_notify, args=(bill,))
+    t.start()
     return HttpResponse('ok')
     # return Http404()

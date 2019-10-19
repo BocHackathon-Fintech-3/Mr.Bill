@@ -35,13 +35,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'widget_tweaks',
     'facebook',
     'sendgrid',
     'accounts',
     'billing'
 ]
-
+SITE_ID=1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -122,6 +123,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
+FB_API_URL_PERSON_PROFILE='https://graph.facebook.com/'
 MR_BILL_FBPAGE_ACCESS_TOKEN = os.environ.get('MR_BILL_FBPAGE_ACCESS_TOKEN')
 MR_BILL_FB_VERIFY_TOKEN = os.environ.get('MR_BILL_FB_VERIFY_TOKEN')
 
