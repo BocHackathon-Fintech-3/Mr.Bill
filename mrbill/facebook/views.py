@@ -70,6 +70,36 @@ class Messenger(BaseMessenger):
         responses = []
         if classifier.is_greeting():
             self.add_res(Text('Hey there {first_name}!'.format(first_name=client.first_name)))
+
+        if not client.is_configured():
+            # self.add_res(Text('It seems your account has not been configured yet. But it is very easy!'))
+            #
+            # self.add_res(Button(
+            #     button_type="web_url",
+            #     title="Let's do this!",
+            #     url=get_absolute_url(reverse('fb_configuration_start')),
+            #     webview_height_ratio="tall",
+            #     messenger_extensions=True,
+            #     share_contents=False
+            # ))
+            base_url = reverse('fb_configuration_start', kwargs={'client_id':str(client.pk)})
+            print(base_url)
+            self.add_res(GenericTemplate(elements=[Element(
+                title='It seems your account has not been configured yet. But it is very easy!',
+                buttons=[
+                    Button(
+                        button_type="web_url",
+                        title="Let's do this!",
+                        url=get_absolute_url(base_url),
+                        webview_height_ratio="tall",
+                        messenger_extensions=True,
+                        share_contents=False
+                    )
+                ])]))
+            self.send_msgs()
+            return
+
+        if classifier.is_greeting():
             elem = Element(
                 title='What would you like to do?',
                 buttons=[
@@ -83,30 +113,6 @@ class Messenger(BaseMessenger):
         else:
             self.add_res(Text('Received: {0}'.format(message['message']['text'])))
 
-        if not client.is_configured():
-            # self.add_res(Text('It seems your account has not been configured yet. But it is very easy!'))
-            #
-            # self.add_res(Button(
-            #     button_type="web_url",
-            #     title="Let's do this!",
-            #     url=get_absolute_url(reverse('fb_configuration_start')),
-            #     webview_height_ratio="tall",
-            #     messenger_extensions=True,
-            #     share_contents=False
-            # ))
-            self.add_res(GenericTemplate(elements=[Element(
-                title='It seems your account has not been configured yet. But it is very easy!',
-                buttons=[
-                    Button(
-                        button_type="web_url",
-                        title="Let's do this!",
-                        url=get_absolute_url(reverse('fb_configuration_start')),
-                        webview_height_ratio="tall",
-                        messenger_extensions=True,
-                        share_contents=False
-                    )
-                ])]))
-            print(get_absolute_url(reverse('fb_configuration_start')))
         self.send_msgs()
 
     def delivery(self, message):
@@ -181,5 +187,7 @@ def webhook(request):
     return HttpResponse("ok")
 
 
-def client_config(request):
-    return HttpResponse("Hello there stranger")
+def client_config(request, client_id):
+    client = Client.objects.get(pk=client_id)
+    url = reverse('boc_auth_account', kwargs={"client_id": client_id})
+    return render(request, 'webviews/start.html', {"client": client, "url": url})

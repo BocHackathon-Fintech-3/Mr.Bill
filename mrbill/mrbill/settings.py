@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'billing'
 ]
-SITE_ID=1
+SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -123,9 +123,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-FB_API_URL_PERSON_PROFILE='https://graph.facebook.com/'
+FB_API_URL_PERSON_PROFILE = 'https://graph.facebook.com/'
 MR_BILL_FBPAGE_ACCESS_TOKEN = os.environ.get('MR_BILL_FBPAGE_ACCESS_TOKEN')
 MR_BILL_FB_VERIFY_TOKEN = os.environ.get('MR_BILL_FB_VERIFY_TOKEN')
 
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = '/'
+
+BOC_API_URL = "https://sandbox-apis.bankofcyprus.com/df-boc-org-sb/sb/psd2"
+BOC_CLIENT_ID = os.environ.get('MR_BILL_BOC_CLIENT_ID')
+BOC_CLIENT_SECRET = os.environ.get('MR_BILL_BOC_SANDBOX_SECRET')
