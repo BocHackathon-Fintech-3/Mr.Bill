@@ -24,6 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('facebook/', include('facebook.urls')),
     path('sendgrid/', include('sendgrid.urls')),
+    path('boc/', include('boc.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('users/', include('users.urls')),
 
