@@ -43,3 +43,28 @@ class Vendor(models.Model):
     name = models.CharField(max_length=254)
     invoice_sending_email = models.EmailField(unique=True)
     bank_account_no = models.CharField(max_length=254, blank=True)
+
+    # Invoice parsing details
+    amount_bbox = models.CharField(max_length=254, blank=True)
+    due_date_bbox = models.CharField(max_length=254, blank=True)
+    invoice_no_bbox = models.CharField(max_length=254, blank=True)
+
+    def __str__(self):
+        return "%s (%s)" % (self.name, self.invoice_sending_email)
+
+    def _get_pts_from_inch(self, coordinates):
+        elements = coordinates.split(',')
+        pts_elements = ["%.2f" % (float(x) * 72) for x in elements]
+        return ','.join(pts_elements)
+
+    @property
+    def amount_bbox_pts(self):
+        return self._get_pts_from_inch(self.amount_bbox)
+
+    @property
+    def invoice_no_bbox_pts(self):
+        return self._get_pts_from_inch(self.invoice_no_bbox)
+
+    @property
+    def due_date_bbox_pts(self):
+        return self._get_pts_from_inch(self.due_date_bbox)
