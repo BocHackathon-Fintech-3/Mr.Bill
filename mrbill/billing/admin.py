@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from .models import Bill
+from .models import Bill, Payment
 
 
 class BillAdmin(admin.ModelAdmin):
-    list_display = ['email_origin', 'received_on','vendor', 'client', 'amount', 'expires_on', 'invoice_no', 'status']
+    list_display = ['email_origin', 'received_on', 'vendor', 'client', 'amount', 'expires_on', 'invoice_no', 'status']
 
     actions = ['parse_bill', 'send_fb_notification']
 
@@ -20,3 +20,5 @@ class BillAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Bill, BillAdmin)
+
+admin.site.register(Payment)
