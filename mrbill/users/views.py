@@ -8,7 +8,8 @@ from accounts.models import Vendor
 def dashboard(request):
     if not hasattr(request.user, 'vendor'):
         return redirect('setup_start')
-    return render(request, 'users/dashboard.html', {})
+    vendor = request.user.vendor
+    return render(request, 'users/dashboard.html', {'vendor': vendor})
 
 
 @login_required
