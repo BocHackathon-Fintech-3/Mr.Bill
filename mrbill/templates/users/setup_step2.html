@@ -59,11 +59,12 @@
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" type="application/javascript"></script>
     <script src="https://unpkg.com/markerjs" type="application/javascript"></script>
     <script>
-        var mark = new markerjs.MarkerArea(document.getElementById('bill-template'), {renderAtNaturalSize: true});
-        window.bboxes = {}
-        mark.open();
 
         $(document).ready(function () {
+            var mark = new markerjs.MarkerArea(document.getElementById('bill-template'), {renderAtNaturalSize: true});
+            window.bboxes = {}
+            mark.open();
+
             $('.add-marker-btn').click(function (e) {
                 var rectMarker = mark.addMarker(markerjs.RectMarker);
                 console.log(e);

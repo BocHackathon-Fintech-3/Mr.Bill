@@ -4,7 +4,7 @@ from django.urls import reverse
 from . import api_calls
 import pprint
 from facebook.views import get_absolute_url
-
+from accounts.models import Client
 
 def authorize_boc_account_empty(request):
     print("Came here from BOC")
@@ -14,11 +14,12 @@ def authorize_boc_account_empty(request):
     client_id = request.session.get('client_id')
     subscription_id = request.session.get('subscription_id')
     current_subscription_details = api_calls.get_subscription_details(access_token, subscription_id)
-    #pprint.pprint(current_subscription_details)
-    #subscription_response = api_calls.patch_subscription(access_token_2, subscription_id)
-    #pprint.pprint(subscription_response)
-    #subscription_id = subscription_response['subscriptionId']
 
+    subscription_response = api_calls.patch_subscription(access_token_2, subscription_id, current_subscription_details)
+    client = Client.objects.get(pk=subscription_id)
+    client.active_subscription_id = subscription_id
+    client.active_access_token = access_token_2
+    client.save()
     return HttpResponse("Boc")
 
 
@@ -49,3 +50,4 @@ def authorize_boc_account(request, client_id):
         access_token=access_token,
     )
     return redirect(url_to_redirect)
+

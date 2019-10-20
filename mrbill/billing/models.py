@@ -90,6 +90,9 @@ class Bill(models.Model):
                 "id": self.client.fbid
             }
         }
+
+        #from boc.api_calls import get_accounts_balances
+        #balances = get_accounts_balances(self.client)
         messenger.add_res(Text(
             "Hey {first_name}! I just received a bill from {vendor_name} for the amount of {amt}. The bill is due on {due_date}".format(
                 first_name=self.client.first_name,

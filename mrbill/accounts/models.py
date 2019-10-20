@@ -15,6 +15,8 @@ class Client(models.Model):
     gender = models.IntegerField(default=0),  # FB api returns a number which designates hours away from GMT
     timezone = models.CharField(max_length=255, blank=True)
     pin = models.SlugField(blank=True)
+    active_subscription_id = models.CharField(max_length=254, blank=True)
+    active_access_token = models.CharField(max_length=254, blank=True)
 
     def __str__(self):
         return '%s' % self.name
