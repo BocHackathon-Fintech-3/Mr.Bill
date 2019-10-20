@@ -4,6 +4,7 @@ import pdfquery
 from decimal import Decimal
 from threading import Thread
 from django.conf import settings
+from facebook.message_utils import MsgClassifier, MsgUtils
 from facebook.views import Messenger
 from .pdfparsing import parse_amt, parse_date
 
@@ -38,7 +39,7 @@ class Bill(models.Model):
 
     @property
     def status(self):
-        if self.payment is not None:
+        if self.payments.exists():
             return 'paid'
         else:
             return 'pending'
@@ -61,17 +62,6 @@ class Bill(models.Model):
         if not self.vendor:
             return False
         pdf = pdfquery.PDFQuery(self.invoice.path)
-        # values = pdf.extract([
-        #     ('with_parent', 'LTPage[pageid=1]'),
-        #     ('with_formatter', 'text'),
-        #
-        #     ('amount', 'LTTextLineHorizontal:in_bbox("%s")' % self.vendor.amount_bbox_pts),
-        #     ('due_date', 'LTTextLineHorizontal:in_bbox("%s")' % self.vendor.due_date_bbox_pts),
-        #     ('invoice_no', 'LTTextLineHorizontal:in_bbox("%s")' % self.vendor.invoice_no_bbox_pts),
-        # ])
-
-        # print(values)
-
         pdf.load()
         amount_txt = pdf.pq('LTTextLineHorizontal:in_bbox("%s")' % self.vendor.amount_bbox_pts).text()
         # print(amount_txt)
@@ -87,6 +77,7 @@ class Bill(models.Model):
         self.save()
 
     def notify_user_initial(self):
+        from facebook.views import Cmds
         # Method to send a notification to user that ths invoice has been ree
         if not self.client.fbid:
             return
@@ -109,8 +100,12 @@ class Bill(models.Model):
         elem = Element(
             title='Would you like to pay now?',
             buttons=[
-                Button('postback', title='Pay Now', payload='pay_now'),
-                Button('postback', title='Snooze', payload='snooze')
+                Button('postback', title='Pay Now', payload=MsgUtils.encode_postback_command(cmd=Cmds.PAY_BILL,
+                                                                                             params={'id': str(
+                                                                                                 self.id)})),
+                Button('postback', title='Snooze', payload=MsgUtils.encode_postback_command(cmd=Cmds.SNOOZE_BILL,
+                                                                                            params={'id': str(
+                                                                                                self.id)}))
 
             ]
         )
@@ -120,7 +115,21 @@ class Bill(models.Model):
         # t = Thread(target=)
         # t.start()
 
+    @property
+    def is_settled(self):
+        return self.payments.exists()
+
+    def settle(self):
+        try:
+            payment = Payment(bill=self, amount=self.amount)
+            payment.save()
+            return True
+        except:
+            return False
+
+
 
 class Payment(models.Model):
+    created_on = models.DateTimeField(auto_now_add=True)
     bill = models.ForeignKey(Bill, on_delete=models.SET_NULL, blank=True, null=True, related_name='payments')
     amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)

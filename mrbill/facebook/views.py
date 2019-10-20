@@ -11,11 +11,16 @@ from accounts.models import Client
 from django.urls import reverse
 from .message_utils import MsgClassifier, MsgUtils
 from django.contrib.sites.models import Site
+import uuid
 
 
 class Cmds:
     CHECK_UNPAID_BIILS = 'check_bills'
     PAY_UNPAID_BIILS = 'pay_bills'
+    PAY_BILL = 'pay_bill'
+    VIEW_BILL = 'view_bill'
+    SNOOZE_BILL = 'snooz_bill'
+    PAY_BILL_PRESTEP = 'pay_bill_prestep'
 
 
 def get_absolute_url(relative_url):
@@ -72,18 +77,7 @@ class Messenger(BaseMessenger):
             self.add_res(Text('Hey there {first_name}!'.format(first_name=client.first_name)))
 
         if not client.is_configured():
-            # self.add_res(Text('It seems your account has not been configured yet. But it is very easy!'))
-            #
-            # self.add_res(Button(
-            #     button_type="web_url",
-            #     title="Let's do this!",
-            #     url=get_absolute_url(reverse('fb_configuration_start')),
-            #     webview_height_ratio="tall",
-            #     messenger_extensions=True,
-            #     share_contents=False
-            # ))
-            base_url = reverse('fb_configuration_start', kwargs={'client_id':str(client.pk)})
-            print(base_url)
+            base_url = reverse('fb_configuration_start', kwargs={'client_id': str(client.pk)})
             self.add_res(GenericTemplate(elements=[Element(
                 title='It seems your account has not been configured yet. But it is very easy!',
                 buttons=[
@@ -125,6 +119,7 @@ class Messenger(BaseMessenger):
         pass
 
     def postback(self, message):
+        from billing.models import Bill
         fbid = message['sender']['id']
         client = get_or_create_client(fbid)
         classifier = MsgClassifier(message)
@@ -160,13 +155,63 @@ class Messenger(BaseMessenger):
                     title='{vendor_name}: {amount}'.format(vendor_name=bill.vendor.name, amount=bill.amount_lbl),
                     subtitle='Due on {due_date}'.format(due_date=bill.due_date_lbl),
                     buttons=[
-                        Button('postback', title='View', payload='view_bill'),
-                        Button('postback', title='Pay', payload='pay_now'),
+                        Button('postback', title='View', payload=MsgUtils.encode_postback_command(cmd=Cmds.VIEW_BILL,
+                                                                                                  params={'id': str(
+                                                                                                      bill.id)})),
+                        Button('postback', title='Pay',
+                               payload=MsgUtils.encode_postback_command(cmd=Cmds.PAY_BILL_PRESTEP,
+                                                                        params={'id': str(
+                                                                            bill.id)})),
                     ]
                 )
                 elements.append(elem)
             res = GenericTemplate(elements=elements)
             self.add_res(res)
+        elif cmd == Cmds.PAY_BILL_PRESTEP:
+            bill_id = classifier.get_params()['id']
+            bill = Bill.objects.get(id=bill_id)
+
+            elem = Element(
+                title='{vendor_name}: {amount}, due on {due_date}'.format(vendor_name=bill.vendor.name, amount=bill.amount_lbl, due_date=bill.due_date_lbl),
+                subtitle="{first_name}, would you like me to round up the bill and...".format(first_name=client.first_name),
+                buttons=[
+                    Button('postback', title='Extra go to charity',
+                           payload=MsgUtils.encode_postback_command(cmd=Cmds.PAY_BILL,
+                                                                    params={'id': str(
+                                                                        bill.id)})),
+                    Button('postback', title='Extra go to savings',
+                           payload=MsgUtils.encode_postback_command(cmd=Cmds.PAY_BILL,
+                                                                    params={'id': str(
+                                                                        bill.id)})),
+                    Button('postback', title='No. Just Pay it',
+                           payload=MsgUtils.encode_postback_command(cmd=Cmds.PAY_BILL,
+                                                                    params={'id': str(
+                                                                        bill.id)})),
+                ]
+            )
+            res = GenericTemplate(elements=[elem])
+            self.add_res(res)
+        elif cmd == Cmds.PAY_BILL:
+            bill_id = classifier.get_params()['id']
+            bill = Bill.objects.get(pk=bill_id)
+            if bill.is_settled:
+                self.add_res(Text(
+                    'It appears you had already paid this {first_name}. Rejoice!'.format(first_name=client.first_name)))
+            else:
+                valid = bill.settle()
+                if valid:
+                    self.add_res(
+                        Text('Coolious {first_name}. Just paid your bill!'.format(first_name=client.first_name)))
+                else:
+                    self.add_res(Text(
+                        'Oops... Sorry {first_name}. It appears there is a problem with my inner mojo and I cannot settle this right now. Try again later? Maybe? Or go spend the money somewhere instead :D'.format(
+                            first_name=client.first_name)))
+        elif cmd == Cmds.SNOOZE_BILL:
+            self.add_res(Text(
+                "Okay {first_name}... I will remind you again when I feel it's a good time to do so!".format(
+                    first_name=client.first_name)))
+            self.add_res(Text("Go play with the ducks now. Or watch the Bill Documentary!"))
+
         self.send_msgs()
 
     def optin(self, message):

@@ -39,7 +39,7 @@ class Client(models.Model):
         return bool(self.pin)
 
     def get_unpaid_bills(self):
-        return self.bills.filter(payment__isnull=True)
+        return self.bills.filter(payments__isnull=True)
 
     def has_unpaid_bills(self):
         return self.get_unpaid_bills().exists()
