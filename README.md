@@ -1,4 +1,5 @@
 # Mr.Bill is in da house!
+Welcome to a new way of Paying your Bills!
 
 ## Some installation instructions
 This runs on Python 3.7. You will need a python virtual environment. Along with the dependencies installed, you will also need to install poppler for the pdf2image conversion to work.
