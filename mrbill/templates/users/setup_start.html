@@ -1,0 +1,16 @@
+{% extends 'users/base_setup.html' %}
+{% block content %}
+
+    <div class="min-h-screen w-3/5 mx-auto h-full flex flex-col justify-center items-center">
+        <img class="w-24 h-24" src="{{ STATIC_URL }}logo-dark-letters.png"/>
+        <h1 class="font-semibold text-4xl text-blue-700 text-center">Welcome {{ request.user.username }}</h1>
+
+        <p class="text-center mt-6">It appears your account has not been configured yet!<br> No worries. It'll only
+            take a
+            minute.</p>
+        <a href="{% url 'setup_step1' %}" class="font-bold border-2 border-blue-600 rounded p-4 text-center mt-8">Let's
+            begin</a>
+
+    </div>
+
+{% endblock %}

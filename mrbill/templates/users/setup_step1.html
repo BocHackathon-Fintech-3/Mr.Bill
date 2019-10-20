@@ -1,0 +1,72 @@
+{% extends 'users/base_setup.html' %}
+{% block content %}
+    {% load widget_tweaks %}
+
+
+
+    <div class="min-h-screen mx-auto w-3/5 flex flex-col justify-center items-center">
+        <h1 class="font-semibold text-4xl text-blue-500 text-center">So {{ request.user.username }},</h1>
+        <h3 class="font-normal text-2xl mt-1"> Let's get you up and running in no time!</h3>
+        <div class="mt-10">
+            <form enctype="multipart/form-data" method="post" action="{% url 'setup_step1' %}" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="text-sm text-red-400">
+                        {{ form.errors }}
+                    </div>
+                {% endif %}
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                        Organization Name
+                    </label>
+                    {% render_field vendor_form.name class+="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %}
+                    {% if vendor_form.name.errors %}
+                        <div class="text-sm text-red-400">
+                            {{ vendor_form.name.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                        Email you sent invoices from
+                    </label>
+                    {% render_field vendor_form.invoice_sending_email class+="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %}
+                    {% if vendor_form.invoice_sending_email.errors %}
+                        <div class="text-sm text-red-400">
+                            {{ vendor_form.invoice_sending_email.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                        Your bank account no (currently only BOC accounts supported)
+                    </label>
+                    {% render_field vendor_form.bank_account_no class+="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" %}
+                    {% if vendor_form.bank_account_no.errors %}
+                        <div class="text-sm text-red-400">
+                            {{ vendor_form.bank_account_no.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mb-4 text-gray-700">
+                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+                        Upload an invoice template (any real invoice will do)
+                    </label>
+                    {{ vendor_form.invoice_template }}
+                    {% if vendor_form.invoice_template.errors %}
+                        <div class="text-sm text-red-400">
+                            {{ vendor_form.invoice_template.errors }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <input type="submit" value="Save and proceed"
+                           class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

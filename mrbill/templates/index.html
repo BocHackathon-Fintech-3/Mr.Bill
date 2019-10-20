@@ -3,7 +3,7 @@
 {% block body %}
 
     <!--Nav-->
-    <div style="background:linear-gradient(90deg, #9ddeef 0%, #9ddeef 100%)">
+    <div class="bg-blue-900"> <!--style="background:linear-gradient(90deg, #9ddeef 0%, #9ddeef 100%)"-->
         <nav id="header" class="fixed w-full z-30 top-0 text-gray-900">
 
             <div class="w-full container mx-auto flex flex-wrap items-center justify-between mt-0 py-2">
@@ -12,7 +12,7 @@
                     <a class="toggleColour no-underline hover:no-underline font-bold text-2xl lg:text-4xl text-gray-900"
                        href="#">
                         <!--Icon from: http://www.potlabicons.com/ -->
-                        <img src="{{ STATIC_URL }}logo-dark-letters.png" class="w-24 h-24 inline-block"/>
+                        <img src="{{ STATIC_URL }}logo-dark-letters.png" class="w-16 h-16 inline-block"/>
                     </a>
                 </div>
 
@@ -26,29 +26,16 @@
                     </button>
                 </div>
 
-                <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 lg:bg-transparent text-black p-4 lg:p-0 z-20 bg-gray-100"
+                <div class="w-full flex-grow lg:flex lg:items-center lg:w-auto hidden lg:block mt-2 lg:mt-0 lg:bg-transparent text-white p-4 lg:p-0 z-20 bg-gray-100"
                      id="nav-content">
                     <ul class="list-reset lg:flex justify-end flex-1 items-center">
-                        <li class="mr-3">
-                            <a class="inline-block py-2 px-4 text-black font-bold no-underline" href="#">Active</a>
-                        </li>
-                        <li class="mr-3">
-                            <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4"
-                               href="#">link</a>
-                        </li>
-                        <li class="mr-3">
-                            <a class="inline-block text-black no-underline hover:text-gray-800 hover:text-underline py-2 px-4"
-                               href="#">link</a>
-                        </li>
                     </ul>
-                    <button id="navAction"
-                            class="mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-4 px-8 shadow opacity-75 bg-white text-gray-800">
-                        Action
-                    </button>
+                    <a id="navAction" href="{% url 'dashboard' %}"
+                            class="mx-auto lg:mx-0 hover:underline font-bold rounded-full mt-4 lg:mt-0 py-2 px-4 shadow opacity-75 bg-white text-gray-800">
+                        Vendor Sign-in
+                    </a>
                 </div>
             </div>
-
-            <hr class="border-b border-gray-100 opacity-25 my-0 py-0">
         </nav>
 
 
@@ -57,25 +44,15 @@
 
             <div class="container px-3 mx-auto flex flex-wrap flex-col md:flex-row items-center">
                 <!--Left Col-->
-                <div class="flex flex-col w-full md:w-2/5 justify-center items-start text-center md:text-left">
-                    <p class="uppercase tracking-loose w-full">Do you pay bills?</p>
-                    <h1 class="my-4 text-5xl font-bold leading-tight">Welcome to a new era of Bill Payments</h1>
-                    <p class="leading-normal text-2xl mb-8"></p>
-
-
-                    <button class="mx-auto lg:mx-0 hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg">
-                        Subscribe
-                    </button>
-
+                <div class="flex flex-col w-full md:w-2/5 justify-center items-start text-center mx-auto ">
+                    <p class="uppercase tracking-loose w-full text-orange-500">Do you pay bills?</p>
+                    <p class="lowercase tracking-loose w-full text-orange-200 text-xs font-sans">Who doesn't!</p>
+                    <h1 class="my-5 text-5xl font-bold leading-tight text-gray-100">Welcome to a new way of Paying your Bills</h1>
+                    <a href="#join-us-title" class="mx-auto hover:underline bg-white text-gray-800 font-bold rounded-full my-6 py-4 px-8 shadow-lg">
+                        Maybe i wanna find out more
+                    </a>
                 </div>
-
-                <!--Right Col-->
-                <div class="w-full md:w-3/5 py-6 text-center">
-                    <img class="w-full md:w-4/5 z-50" src="https://images.unsplash.com/photo-1554672723-d42a16e533db?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=60">
-                </div>
-
             </div>
-
         </div>
 
 
@@ -100,9 +77,9 @@
 
 
     </div>
-    <section class="bg-white border-b py-8">
+    <section class="bg-white border-b py-8 mt-24">
         <div class="container max-w-5xl mx-auto m-8">
-            <h1 class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">Title</h1>
+            <h1 id="join-us-title" class="w-full my-2 text-5xl font-bold leading-tight text-center text-gray-800">Join us to make bill payment slightly <br><span class="text-green-600">less painfull</span></h1>
             <div class="w-full mb-4">
                 <div class="h-1 mx-auto gradient w-64 opacity-25 my-0 py-0 rounded-t"></div>
             </div>
@@ -433,6 +410,7 @@
 
     </section>
 
+    {% comment %}
     <section class="bg-gray-100 py-8">
 
 
@@ -517,7 +495,7 @@
 
     </section>
 
-
+    {% endcomment %}
 
     <!-- Change the colour #f8fafc to match the previous section colour -->
     <svg class="wave-top" viewBox="0 0 1439 147" version="1.1" xmlns="http://www.w3.org/2000/svg"

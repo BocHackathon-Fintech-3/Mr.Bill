@@ -23,7 +23,6 @@ class Bill(models.Model):
     amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)
     invoice_no = models.CharField(blank=True, max_length=254)
     expires_on = models.DateTimeField(blank=True, null=True)
-    payment = models.ForeignKey('billing.Payment', on_delete=models.CASCADE, blank=True, null=True)
 
     parsed = models.BooleanField(default=False)
     notification_sent = models.BooleanField(default=False)
@@ -123,4 +122,5 @@ class Bill(models.Model):
 
 
 class Payment(models.Model):
-    pass
+    bill = models.ForeignKey(Bill, on_delete=models.SET_NULL, blank=True, null=True, related_name='payments')
+    amount = models.DecimalField(blank=True, null=True, max_digits=10, decimal_places=2)

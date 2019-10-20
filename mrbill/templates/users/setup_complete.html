@@ -1,0 +1,23 @@
+{% extends 'users/base_setup.html' %}
+{% block content %}
+    {% load widget_tweaks %}
+
+    <div class="min-h-screen w-full bg-gray-900">
+        <a href="/"><img class="w-16 h-16 absolute left-0 right-0 ml-4 mt-4"
+                         src="{{ STATIC_URL }}logo-dark-letters.png"/></a>
+        <div class="min-h-screen mx-auto w-2/5 flex flex-col justify-center items-center  text-white">
+            <h1 class="font-semibold text-4xl text-blue-500 text-center">You are all set!</h1>
+            <p class="font-normal text-2xl mt-4 text-center"> Now anyone that facilitates MrBill for his bill payments
+                will also be able to <span class="text-red-400 font-bold">pay bills</span> originating <span
+                        class="text-red-400 font-bold">from you</span>!
+            </p>
+            <p class="mt-6 text-normal tracking-wider font-semibold">Better, cheaper, and faster for everyone.
+                Rejoice!</p>
+            <p class="text-sm italic mt-16 w-full text-center">Yours truly, <span class="font-semibold">MrBill</span>
+            </p>
+        </div>
+        <div class="absolute bottom-0 w-full text-center pb-6"><a href="{% url 'dashboard' %}"
+                                                                  class="underline text-normal font-semibold">Check your
+            dashboard</a></div>
+    </div>
+{% endblock %}

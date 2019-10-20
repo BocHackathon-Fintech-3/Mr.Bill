@@ -1,0 +1,134 @@
+{% extends 'users/base_setup.html' %}
+{% block content %}
+    {% load widget_tweaks %}
+
+    <a href="/"><img class="w-16 h-16 absolute left-0 right-0 ml-4 mt-4"
+                     src="{{ STATIC_URL }}logo-dark-letters.png"/></a>
+    <div class="flex min-h-screen">
+        <div class="flex-grow flex flex-col justify-center items-center text-white">
+            <h1 class="font-semibold text-4xl text-blue-500 text-center">Your are almost done<br>{{ vendor.name }}</h1>
+            <h3 class="font-normal text-2xl mt-4"> Let's configure your invoice parsing settings</h3>
+
+            <div class="bg-white shadow-md rounded px-8 py-8 mt-8 flex flex-col items-center">
+                <p class="text-purple-800 font-semibold text-xs max-w-sm text-center mb-4">First, create a box over the
+                    area that holds the total invoice amount</p>
+                <button id='amount_btn'
+                        class="add-marker-btn border border-red-500 rounded px-2 py-3 font-bold block w-64 mb-4 text-gray-800">
+                    Add
+                    amount box
+                </button>
+                <div class="hidden w-full flex flex-col items-center justify-center">
+                    <p class="text-purple-800 font-semibold text-xs max-w-sm text-center mb-4">Next, a box around the
+                        due date </p>
+                    <button id="dute_date_btn"
+                            class="add-marker-btn border border-blue-500 rounded px-2 py-3 font-bold block w-64 mb-4 text-gray-800">
+                        Add
+                        due date box
+                    </button>
+                </div>
+                <div class="hidden w-full flex flex-col items-center justify-center">
+                    <p class="text-purple-800 font-semibold text-xs max-w-sm text-center mb-4">Finally, a box around the
+                        invoice number</p>
+                    <button id="invoice_no_btn"
+                            class="add-marker-btn border border-green-500 rounded px-2 py-3 font-bold block w-64 mb-4 text-gray-800">
+                        Add
+                        invoice no box
+                    </button>
+                </div>
+                <div class="flex items-center justify-between hidden">
+                    <button class="bg-blue-500 w-64 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                            id="checkMarkers">Save & Finish
+                    </button>
+                </div>
+                <form method="post" action="{% url 'setup_step2' %}">
+                    {% csrf_token %}
+                    {% render_field form.amount_bbox type='hidden' %}
+                    {% render_field form.due_date_bbox type='hidden' %}
+                    {% render_field form.invoice_no_bbox type='hidden' %}
+                </form>
+            </div>
+        </div>
+        <div class="p-4 border-l-2 border-red-700">
+            <img id="bill-template" src="{{ vendor.invoice_template_img.url }}" class="h-screen w-auto"/>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block extra_js %}
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" type="application/javascript"></script>
+    <script src="https://unpkg.com/markerjs" type="application/javascript"></script>
+    <script>
+        var mark = new markerjs.MarkerArea(document.getElementById('bill-template'), {renderAtNaturalSize: true});
+        window.bboxes = {}
+        mark.open();
+
+        $(document).ready(function () {
+            $('.add-marker-btn').click(function (e) {
+                var rectMarker = mark.addMarker(markerjs.RectMarker);
+                console.log(e);
+                console.log($(this).attr('id'));
+                if (e.target.id == 'amount_btn') {
+                    $('#dute_date_btn').parent().removeClass('hidden');
+                } else if (e.target.id == 'dute_date_btn') {
+                    $('#invoice_no_btn').parent().removeClass('hidden');
+                } else if (e.target.id == 'invoice_no_btn') {
+                    $('#checkMarkers').parent().removeClass('hidden');
+                }
+            });
+            $('#checkMarkers').click(function (e) {
+
+                var screenImage = $("#bill-template");
+                // Create new offscreen image to test
+                var theImage = new Image();
+                theImage.src = screenImage.attr("src");
+                // Get accurate measurements from that.
+                var data = {
+                    rectMarkers: []
+                };
+                var dpi = 96;
+                var $svg = $($('svg')[0]);
+                data.imgWidth = parseInt($svg.attr('width'));
+                data.imgHeight = parseInt($svg.attr('height'));
+                data.imgWidthReal = theImage.width;
+                data.imgHeightReal = theImage.height;
+                data.widthCorrectingFactor = data.imgWidthReal / data.imgWidth;
+                data.heightCorrectingFactor = data.imgHeightReal / data.imgHeight;
+
+                $('.rect-marker').each(function () {
+                    var matrix = $(this).prop('transform').baseVal[0].matrix;
+                    var rect = {
+                        x: matrix.e,
+                        y: matrix.f,
+                    }
+                    var rect_elem = $(this).find('.render-visual rect')[0];
+                    rect.w = parseInt($(rect_elem).attr('width'));
+                    rect.h = parseInt($(rect_elem).attr('height'));
+
+                    rect.y1 = data.imgHeight - rect.y;
+                    rect.y0 = rect.y1 - rect.h;
+                    rect.x0 = rect.x;
+                    rect.x1 = rect.x0 + rect.w;
+                    rect.inches = {
+                        x0: rect.x0 * data.widthCorrectingFactor / dpi,
+                        y0: rect.y0 * data.heightCorrectingFactor / dpi,
+                        x1: rect.x1 * data.widthCorrectingFactor / dpi,
+                        y1: rect.y1 * data.heightCorrectingFactor / dpi,
+                    }
+                    data.rectMarkers.push(rect);
+                });
+                console.log(data);
+                window.bboxes.amount_bbx = "" + data.rectMarkers[0].inches.x0 + "," + data.rectMarkers[0].inches.y0 + "," + data.rectMarkers[0].inches.x1 + "," + data.rectMarkers[0].inches.y1;
+                window.bboxes.due_date_bbx = "" + data.rectMarkers[1].inches.x0 + "," + data.rectMarkers[1].inches.y0 + "," + data.rectMarkers[1].inches.x1 + "," + data.rectMarkers[1].inches.y1;
+                window.bboxes.invoice_no_bbx = "" + data.rectMarkers[2].inches.x0 + "," + data.rectMarkers[2].inches.y0 + "," + data.rectMarkers[2].inches.x1 + "," + data.rectMarkers[2].inches.y1;
+                $('#id_amount_bbox').val(window.bboxes.amount_bbx);
+                $('#id_due_date_bbox').val(window.bboxes.due_date_bbx);
+                $('#id_invoice_no_bbox').val(window.bboxes.invoice_no_bbx);
+                $('form').submit();
+            })
+        });
+    </script>
+    <script>
+
+    </script>
+{% endblock %}

@@ -1,6 +1,6 @@
 import re
 from dateutil.parser import parse
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 
 def parse_amt(txt):
@@ -9,6 +9,8 @@ def parse_amt(txt):
     try:
         return Decimal(result)
     except ValueError:
+        return None
+    except InvalidOperation:
         return None
 
 

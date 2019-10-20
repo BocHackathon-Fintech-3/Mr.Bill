@@ -2,7 +2,7 @@
 
 {% block body %}
     {% load widget_tweaks %}
-    <div class="flex h-screen justify-center items-center">
+    <div class="flex h-screen justify-center items-center bg-blue-900">
         <div class="w-full max-w-xs">
             {% if form.errors %}
                 <p>Your username and password didn't match. Please try again.</p>
@@ -13,7 +13,7 @@
                     <p>Your account doesn't have access to this page. To proceed,
                         please login with an account that has access.</p>
                 {% else %}
-                    <p>Please login to see this page.</p>
+                    <p class="text-white text-center mb-6">Please login to see this page.</p>
                 {% endif %}
             {% endif %}
 

@@ -1,5 +1,6 @@
 from django.db import models
 import uuid
+from django.contrib.auth.models import User
 
 
 class Client(models.Model):
@@ -39,6 +40,7 @@ class Client(models.Model):
 
     def get_unpaid_bills(self):
         return self.bills.filter(payment__isnull=True)
+
     def has_unpaid_bills(self):
         return self.get_unpaid_bills().exists()
 
@@ -48,6 +50,7 @@ class Client(models.Model):
 
 class Vendor(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(User, blank=True, null=True, related_name='vendor', on_delete=models.SET_NULL)
     name = models.CharField(max_length=254)
     invoice_sending_email = models.EmailField(unique=True)
     bank_account_no = models.CharField(max_length=254, blank=True)
@@ -56,6 +59,9 @@ class Vendor(models.Model):
     amount_bbox = models.CharField(max_length=254, blank=True)
     due_date_bbox = models.CharField(max_length=254, blank=True)
     invoice_no_bbox = models.CharField(max_length=254, blank=True)
+
+    invoice_template = models.FileField(upload_to='invoices_templates')
+    invoice_template_img = models.ImageField(blank=True, null=True)
 
     def __str__(self):
         return "%s (%s)" % (self.name, self.invoice_sending_email)
@@ -76,3 +82,28 @@ class Vendor(models.Model):
     @property
     def due_date_bbox_pts(self):
         return self._get_pts_from_inch(self.due_date_bbox)
+
+    def get_payments(self):
+        from billing.models import Payment
+        return Payment.objects.filter(bill__vendor=self)
+
+    def extract_pdf_img(self):
+        from pdf2image import convert_from_path
+        from PIL import Image
+        from django.core.files.uploadedfile import InMemoryUploadedFile
+        import io, uuid
+        from django.core.files.base import ContentFile
+
+        images = convert_from_path(self.invoice_template.path, dpi=96, output_folder=None, first_page=1, last_page=1,
+                                   fmt='jpg')
+        img = images[0]
+        # img.save('out.jpg', 'JPEG')
+        thumb_io = io.BytesIO()
+        img.save(thumb_io, format='JPEG')
+        # image_file = InMemoryUploadedFile(thumb_io, None, 'rotate.jpg', 'image/jpeg', thumb_io.len, None)
+        self.invoice_template_img.save(
+            'invoices_images/%s.jpg' % str(uuid.uuid4().hex),
+            content=ContentFile(thumb_io.getvalue()),
+            save=False
+        )
+        self.save()
