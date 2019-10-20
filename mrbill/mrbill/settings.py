@@ -12,6 +12,13 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 
+SERVER_TYPE = os.environ.get('SERVER_TYPE', 'Not Set')
+
+PROD = False
+
+if SERVER_TYPE == 'PROD':
+    PROD = True
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -24,7 +31,12 @@ SECRET_KEY = 'z*w8w1c+f!0+-tey_u^0$s^n!9zs9s6nm!k#3vb)#!ip@n#pbe'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.ngrok.io', 'locahost']
+if not PROD:
+    DEBUG = True
+    ALLOWED_HOSTS = ['127.0.0.1', '.ngrok.io', 'locahost']
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = ['.ngrok.io', 'locahost', '.mrbill.app']
 
 # Application definition
 
@@ -121,8 +133,13 @@ USE_TZ = True
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "assets"),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+if PROD:
+    STATIC_ROOT = '/home/zentar/webapps/mrbill_static'
+    STATIC_ROOT = '/home/zentar/webapps/mrbill_media'
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
