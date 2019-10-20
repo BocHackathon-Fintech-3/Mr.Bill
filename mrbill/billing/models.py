@@ -11,7 +11,7 @@ from .pdfparsing import parse_amt, parse_date
 
 class Bill(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name='bills')
-    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True,related_name='bills')
     email_origin = models.CharField(max_length=254)
     email_subject = models.CharField(max_length=254, blank=True)
     email_content_html = models.TextField(blank=True)

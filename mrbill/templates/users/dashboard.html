@@ -13,4 +13,82 @@
         </div>
     </div>
 
+    <div class="container mx-auto">
+        <div class="w-full">
+            <h1 class="font-semibold text-2xl text-white-700 text-center">Latest Payments</h1>
+
+
+            <div class="w-2/3 mx-auto">
+                <div class="bg-white text-black shadow-md rounded my-6">
+                    <table class="text-left w-full border-collapse">
+                        <!--Border collapse doesn't work on this site yet but it's available in newer tailwind versions -->
+                        <thead>
+                        <tr>
+                            <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                                Date
+                            </th>
+                            <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                                Amount
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for payment in vendor.get_payments %}
+                            <tr class="hover:bg-grey-lighter">
+                                <td class="py-4 px-6 border-b border-grey-light">{{ payment.created_on }}</td>
+                                <td class="py-4 px-6 border-b border-grey-light">
+                                    &euro;{{ payment.amount }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<div class="container mx-auto">
+        <div class="w-full">
+            <h1 class="font-semibold text-2xl text-white-700 text-center">Latest Bills Parsed</h1>
+
+
+            <div class="w-2/3 mx-auto">
+                <div class="bg-white text-black shadow-md rounded my-6">
+                    <table class="text-left w-full border-collapse">
+                        <!--Border collapse doesn't work on this site yet but it's available in newer tailwind versions -->
+                        <thead>
+                        <tr>
+                            <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                                Date
+                            </th>
+                             <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                                Client
+                            </th>
+                            <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                                Invoice No
+                            </th>
+                            <th class="py-4 px-6 bg-grey-lightest font-bold uppercase text-sm text-grey-dark border-b border-grey-light">
+                                Amount
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for bill in vendor.bills.all %}
+                            <tr class="hover:bg-grey-lighter">
+                                <td class="py-4 px-6 border-b border-grey-light">{{ bill.received_on }}</td>
+                                <td class="py-4 px-6 border-b border-grey-light">{{ bill.client.name }}</td>
+                                <td class="py-4 px-6 border-b border-grey-light">{{ bill.invoice_no }}</td>
+                                <td class="py-4 px-6 border-b border-grey-light">
+                                    &euro;{{ bill.amount }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}
