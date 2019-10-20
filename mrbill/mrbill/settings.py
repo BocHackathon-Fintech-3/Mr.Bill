@@ -136,7 +136,7 @@ STATICFILES_DIRS = [
 
 if PROD:
     STATIC_ROOT = '/home/zentar/webapps/mrbill_static'
-    STATIC_ROOT = '/home/zentar/webapps/mrbill_media'
+    MEDIA_ROOT = '/home/zentar/webapps/mrbill_media'
 else:
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
