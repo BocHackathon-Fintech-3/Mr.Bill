@@ -4,7 +4,7 @@ cssselect==1.1.0
 distro==1.4.0
 Django==2.2.6
 django-widget-tweaks==1.4.5
-djangorestframework==3.10.3
+djangorestframework==3.11.2
 fbmessenger==6.0.0
 idna==2.8
 lxml==4.4.1
